@@ -1,5 +1,7 @@
 class Ball {
-  ENERGY_DECAY = 1 / 80;
+  #ENERGY_DECAY = 1 / 80;
+  #LAUNCH_RANGE = 80;
+  #RING_GAP = 12;
 
   constructor(mouse) {
     this.x = 0;
@@ -15,7 +17,7 @@ class Ball {
 
   update(deltaTime, walls) {
     if (this.energy > 0) {
-      this.energy -= this.ENERGY_DECAY;
+      this.energy -= this.#ENERGY_DECAY;
     }
 
     if (this.energy < 0) {
@@ -94,7 +96,10 @@ class Ball {
       return;
     }
 
-    this.aiming = true;
+    const distance = calculateDistance(this, this.mouse);
+    if (distance <= this.#LAUNCH_RANGE) {
+      this.aiming = true;
+    }
   }
 
   launch() {
@@ -109,15 +114,19 @@ class Ball {
     this.direction.y = -Math.sin(angle);
 
     let distance = calculateDistance(this, this.mouse);
-    if (distance > 80) {
-      distance = 80;
+    if (distance > this.#LAUNCH_RANGE) {
+      distance = this.#LAUNCH_RANGE;
     }
-    this.energy = distance / 80;
+    this.energy = distance / this.#LAUNCH_RANGE;
   }
 
   draw(ctx) {
     if (this.aiming) {
       this.drawPointer(ctx);
+    }
+
+    if (this.energy <= 0 && !this.aiming) {
+      this.drawRing(ctx);
     }
 
     ctx.save();
@@ -134,12 +143,12 @@ class Ball {
   drawPointer(ctx) {
     const angle = calculateAngle(this, this.mouse);
     let distance = calculateDistance(this, this.mouse);
-    if (distance > 80) {
-      distance = 80;
+    if (distance > this.#LAUNCH_RANGE) {
+      distance = this.#LAUNCH_RANGE;
     }
 
-    const arrowEndX = this.x + 80 * -Math.cos(angle);
-    const arrowEndY = this.y + 80 * -Math.sin(angle);
+    const arrowEndX = this.x + this.#LAUNCH_RANGE * -Math.cos(angle);
+    const arrowEndY = this.y + this.#LAUNCH_RANGE * -Math.sin(angle);
 
     const levelEndX = this.x + distance * -Math.cos(angle);
     const levelEndY = this.y + distance * -Math.sin(angle);
@@ -159,6 +168,19 @@ class Ball {
     ctx.beginPath();
     ctx.moveTo(this.x, this.y);
     ctx.lineTo(levelEndX, levelEndY);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  drawRing(ctx) {
+    ctx.save();
+
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = this.radius / 2;
+
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.#LAUNCH_RANGE, 0, Math.PI * 2, false);
     ctx.stroke();
 
     ctx.restore();

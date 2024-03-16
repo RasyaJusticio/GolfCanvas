@@ -8,6 +8,7 @@
   const cacheCtx = cacheCanvas.getContext("2d");
 
   const mouse = { x: 0, y: 0 };
+  const hole = { x: 0, y: 0, radius: 14 };
   const ball = new Ball(mouse);
 
   let currentLevel = 0;
@@ -25,11 +26,35 @@
 
     ball.x = levelData.start.x;
     ball.y = levelData.start.y;
+
+    hole.x = levelData.end.x;
+    hole.y = levelData.end.y;
   }
 
   // Update Functions
 
+  // Util Functions
+  function checkHoleCollision() {
+    const distance = Math.sqrt((hole.x - ball.x) ** 2 + (hole.y - ball.y) ** 2);
+
+    if (distance <= ball.radius + hole.radius) {
+      ball.energy = 0;
+    }
+  }
+
   // Draw Functions
+  function drawHole() {
+    ctx.save();
+
+    ctx.fillStyle = "black";
+
+    ctx.beginPath();
+    ctx.arc(hole.x, hole.y, hole.radius + 4, 0, 2 * Math.PI, false);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
   function drawMap() {
     ctx.drawImage(cacheCanvas, 0, 0);
   }
@@ -89,6 +114,7 @@
   // Main
   function update(deltaTime) {
     ball.update(deltaTime, levelData.walls);
+    checkHoleCollision();
   }
 
   function draw() {
@@ -96,6 +122,7 @@
     ctx.save();
 
     drawMap();
+    drawHole();
     ball.draw(ctx);
 
     ctx.restore();

@@ -1,7 +1,7 @@
 const levels = [
   {
     start: { x: 102.4, y: 128 },
-    end: { x: 0, y: 0 },
+    end: { x: 409.6, y: 128 },
     size: { width: 512, height: 256 },
     walls: [
       { x: 15, y: 0 },
