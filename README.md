@@ -22,3 +22,7 @@ The game is developed using HTML, CSS, and JavaScript. It leverages the canvas e
 2. Enter your username.
 3. Follow the on-screen instructions to learn how to play.
 4. Enjoy playing through multiple levels of golf challenges!
+
+## Credits
+
+- [Background Image by Sketchepedia on Freepik](https://www.freepik.com/free-vector/abstract-business-professional-background-banner-design-multipurpose_23485401.htm#query=green%20pattern&position=20&from_view=keyword&track=ais&uuid=0f6bfa89-0668-413c-9158-17502ccd4d63)

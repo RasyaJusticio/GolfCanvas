@@ -1,10 +1,34 @@
+:root {
+  --color-background: rgb(1, 57, 9);
+  --color-border: rgb(4, 199, 32);
+  --color-shadow: 4, 199, 32;
+
+  --color-btn-bg: rgb(84, 84, 236);
+  --color-btn-bg-s: rgba(17, 17, 39, 0.6);
+  
+  --color-btn-bg-h: rgb(101, 101, 234);
+  --color-btn-bg-s-h: rgb(27, 27, 61);
+}
+
 * {
+  font-family: 'Poppins', sans-serif;
+  color: white;
   margin: 0;
   padding: 0;
 }
 
 .page {
+  background-image: url(./assets/background-img.jpg);
+  background-size: cover;
   min-height: 100vh;
+}
+
+.page > .container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .hidden {

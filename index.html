@@ -3,16 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./style.css" />
     <link rel="stylesheet" href="./pages/game/style.css" />
     <link rel="stylesheet" href="./pages/menu/style.css" />
     <title>Golf</title>
   </head>
   <body>
-    <div class="page" id="menu"></div>
+    <div class="page" id="menu">
+      <div class="container">
+        <div class="panel">
+          <h1 class="title">2D Golf</h1>
+          <div class="actions">
+            <input
+              type="text"
+              id="usernameInput"
+              placeholder="Enter your username"
+            />
+            <button id="openLeaderboard">Leaderboard</button>
+            <div class="inline-buttons">
+              <button id="playGame">Play</button>
+              <button id="openTutorial">?</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <div class="page" id="game"></div>
+    <div class="page" id="game">
+      
+    </div>
 
     <script src="./script.js"></script>
+    <script src="./pages/menu/script.js"></script>
   </body>
 </html>
