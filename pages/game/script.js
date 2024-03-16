@@ -8,12 +8,16 @@
   const cacheCtx = cacheCanvas.getContext("2d");
 
   const mouse = { x: 0, y: 0 };
-  const hole = { x: 0, y: 0, radius: 14 };
+  const hole = { x: 0, y: 0, radius: 18, ballIn: false, animationTime: 2.5 };
   const ball = new Ball(mouse);
 
   let currentLevel = 0;
   let levelData = levels[currentLevel];
-  let lastTime = 0;
+
+  let started = false;
+  let timer = 30;
+  let lastTime = performance.now();
+  let perSecondTime = 0;
 
   function initLevel() {
     const levelData = levels[currentLevel];
@@ -32,25 +36,80 @@
   }
 
   // Update Functions
+  function updateTimer() {
+    if (!started || ball.holeIn) {
+      return;
+    }
+
+    if (timer <= 0) {
+      timer = 0;
+      return;
+    }
+
+    timer--;
+  }
 
   // Util Functions
   function checkHoleCollision() {
     const distance = Math.sqrt((hole.x - ball.x) ** 2 + (hole.y - ball.y) ** 2);
 
-    if (distance <= ball.radius + hole.radius) {
-      ball.energy = 0;
+    if (distance <= ball.radius + 2 && ball.energy < 0.83) {
+      triggerHoleIn();
     }
   }
 
+  function triggerHoleIn() {
+    ball.holeIn = true;
+    hole.ballIn = true;
+
+    ball.energy = 0;
+    ball.x = hole.x;
+    ball.y = hole.y;
+  }
+
   // Draw Functions
-  function drawHole() {
+  function drawHole(deltaTime) {
     ctx.save();
 
     ctx.fillStyle = "black";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
+    ctx.shadowBlur = 14;
 
     ctx.beginPath();
-    ctx.arc(hole.x, hole.y, hole.radius + 4, 0, 2 * Math.PI, false);
+
+    if (!hole.ballIn) {
+      ctx.arc(hole.x, hole.y, hole.radius, 0, 2 * Math.PI, false);
+    } else {
+      if (hole.animationTime <= 0) {
+        hole.animationTime = 0;
+        return;
+      }
+
+      if (hole.animationTime <= 1) {
+        const radius = hole.radius * hole.animationTime;
+        ctx.arc(hole.x, hole.y, radius, 0, 2 * Math.PI, false);
+      } else {
+        ctx.arc(hole.x, hole.y, hole.radius, 0, 2 * Math.PI, false);
+      }
+
+      hole.animationTime -= 0.1;
+    }
+
     ctx.fill();
+
+    ctx.restore();
+  }
+
+  function drawTimer() {
+    ctx.save();
+
+    ctx.textAlign = "center";
+    if (!ball.holeIn) {
+      ctx.font = "14px Poppins";
+    } else {
+      ctx.font = `${14 * ball.animationTime}px Poppins`;
+    }
+    ctx.fillText(timer, ball.x, ball.y + 5);
 
     ctx.restore();
   }
@@ -108,22 +167,34 @@
       return;
     }
 
-    ball.launch();
+    if (ball.launch()) {
+      if (!started) {
+        started = true;
+        timer--;
+      }
+    }
   });
 
   // Main
   function update(deltaTime) {
     ball.update(deltaTime, levelData.walls);
     checkHoleCollision();
+
+    perSecondTime += deltaTime / 1000;
+    if (perSecondTime > 1) {
+      perSecondTime = 0;
+      updateTimer();
+    }
   }
 
-  function draw() {
+  function draw(deltaTime) {
     ctx.clearRect(0, 0, 9999, 9999);
     ctx.save();
 
     drawMap();
-    drawHole();
+    drawHole(deltaTime);
     ball.draw(ctx);
+    drawTimer();
 
     ctx.restore();
   }
@@ -137,7 +208,7 @@
     const deltaTime = currentTime - lastTime || 0;
 
     update(deltaTime);
-    draw();
+    draw(deltaTime);
 
     lastTime = currentTime;
 

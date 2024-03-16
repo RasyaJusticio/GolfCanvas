@@ -6,7 +6,7 @@ This is a 2D golf game that I developed. Players can enjoy a fun and challenging
 
 ## Development
 
-The game is developed using HTML, CSS, and JavaScript. It leverages the canvas element to create the interactive gameplay environment.
+The game is developed using HTML, CSS, and JavaScript. It leverages the canvas element to create the interactive gameplay environment. Using Separating Axis Theorem (SAT) algorithm for the collision detection.
 
 ## Tools Used
 

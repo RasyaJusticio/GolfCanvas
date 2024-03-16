@@ -1,18 +1,22 @@
 class Ball {
   #ENERGY_DECAY = 1 / 80;
   #LAUNCH_RANGE = 80;
-  #RING_GAP = 12;
 
   constructor(mouse) {
     this.x = 0;
     this.y = 0;
-    this.radius = 8;
+    this.radius = 12;
+
+    this.lastPos = { x: 0, y: 0 };
 
     this.direction = { x: 0, y: 0 };
     this.energy = 0;
 
     this.mouse = mouse;
     this.aiming = false;
+
+    this.holeIn = false;
+    this.animationTime = 1;
   }
 
   update(deltaTime, walls) {
@@ -24,6 +28,7 @@ class Ball {
       this.energy = 0;
     }
 
+    this.lastPos = { x: this.x, y: this.y };
     this.x += this.direction.x * this.energy * deltaTime;
     this.y += this.direction.y * this.energy * deltaTime;
 
@@ -46,14 +51,27 @@ class Ball {
       axis.x /= magnitude;
       axis.y /= magnitude;
 
+      const thickP1 = {
+        x: p1.x - 2 * axis.x,
+        y: p1.y - 2 * axis.y,
+      };
+
+      const thickP2 = {
+        x: p2.x - 2 * axis.x,
+        y: p2.y - 2 * axis.y,
+      };
+
       const ballProjection = this.#project(this, axis);
-      const wallProjection = this.#project([p1, p2], axis);
+      const wallProjection = this.#project([thickP1, thickP2], axis);
 
       ballProjection.min -= this.radius;
       ballProjection.max += this.radius;
 
       if (this.#overlap(ballProjection, wallProjection)) {
         collide = true;
+
+        this.x = this.lastPos.x;
+        this.y = this.lastPos.y;
 
         const dotProduct =
           this.direction.x * axis.x + this.direction.y * axis.y;
@@ -92,7 +110,7 @@ class Ball {
   }
 
   startAiming() {
-    if (this.energy > 0) {
+    if (this.energy > 0 || this.holeIn) {
       return;
     }
 
@@ -104,7 +122,7 @@ class Ball {
 
   launch() {
     if (!this.aiming) {
-      return;
+      return false;
     }
 
     this.aiming = false;
@@ -118,23 +136,45 @@ class Ball {
       distance = this.#LAUNCH_RANGE;
     }
     this.energy = distance / this.#LAUNCH_RANGE;
+
+    return true;
   }
 
   draw(ctx) {
-    if (this.aiming) {
-      this.drawPointer(ctx);
-    }
+    if (!this.holeIn) {
+      if (this.aiming) {
+        this.drawPointer(ctx);
+      }
 
-    if (this.energy <= 0 && !this.aiming) {
-      this.drawRing(ctx);
+      if (this.energy <= 0 && !this.aiming) {
+        this.drawRing(ctx);
+      }
     }
 
     ctx.save();
 
     ctx.fillStyle = "white";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
+    ctx.shadowBlur = 14;
 
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+
+    if (!this.holeIn) {
+      ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+    } else {
+      if (this.animationTime <= 0) {
+        this.animationTime = 0;
+        return;
+      }
+
+      if (this.animationTime <= 1) {
+        const radius = (this.radius + 4) * this.animationTime;
+        ctx.arc(this.x, this.y, radius, 0, 2 * Math.PI, false);
+      }
+
+      this.animationTime -= 0.1;
+    }
+
     ctx.fill();
 
     ctx.restore();
@@ -157,6 +197,8 @@ class Ball {
 
     ctx.strokeStyle = "white";
     ctx.lineWidth = 5;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+    ctx.shadowBlur = 14;
 
     ctx.beginPath();
     ctx.moveTo(this.x, this.y);
@@ -164,6 +206,8 @@ class Ball {
     ctx.stroke();
 
     ctx.strokeStyle = "green";
+    ctx.shadowColor = "rgba(155, 255, 155, 0.4)";
+    ctx.shadowBlur = 14;
 
     ctx.beginPath();
     ctx.moveTo(this.x, this.y);
@@ -178,6 +222,8 @@ class Ball {
 
     ctx.strokeStyle = "white";
     ctx.lineWidth = this.radius / 2;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
+    ctx.shadowBlur = 14;
 
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.#LAUNCH_RANGE, 0, Math.PI * 2, false);
