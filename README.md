@@ -26,3 +26,4 @@ The game is developed using HTML, CSS, and JavaScript. It leverages the canvas e
 ## Credits
 
 - [Background Image by Sketchepedia on Freepik](https://www.freepik.com/free-vector/abstract-business-professional-background-banner-design-multipurpose_23485401.htm#query=green%20pattern&position=20&from_view=keyword&track=ais&uuid=0f6bfa89-0668-413c-9158-17502ccd4d63)
+- [Favicon by Freepik on Flaticon](https://www.flaticon.com/free-icons/golf)

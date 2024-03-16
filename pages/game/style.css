@@ -1,3 +1,9 @@
 #game {
-
+  .top-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    inset-inline: 0;
+    padding: 12px;
+  }
 }

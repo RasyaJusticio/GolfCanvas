@@ -31,4 +31,4 @@ function changePage(targetPageKey) {
   });
 }
 
-changePage("menu");
+changePage("game");
