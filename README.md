@@ -2,7 +2,7 @@
 
 ## Hiatus Reason
 
-There's a problem with the collision detection that I used (SAT). It seems that it cannot handle concave shapes. And this is bad for when with the maps that I have in my mind. I will comeback to this after I had learned more. I am very sorry.
+There's a problem with the collision detection that I used (SAT). It seems that it cannot handle concave shapes. And this is bad for the maps that I have in mind. I will comeback to this after I had learned more. I am very sorry.
 
 ## Description
 
