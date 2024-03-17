@@ -19,7 +19,7 @@ class Ball {
     this.animationTime = 1;
   }
 
-  update(deltaTime, walls) {
+  update(deltaTime, levelData) {
     if (this.energy > 0) {
       this.energy -= this.#ENERGY_DECAY;
     }
@@ -32,51 +32,89 @@ class Ball {
     this.x += this.direction.x * this.energy * deltaTime;
     this.y += this.direction.y * this.energy * deltaTime;
 
-    this.#detectWallCollision(walls);
+    this.#detectWallCollision(levelData);
   }
 
-  #detectWallCollision(walls) {
+  #detectWallCollision(levelData) {
     let collide = false;
 
-    for (let i = 0; i < walls.length - 1; i++) {
-      const p1 = walls[i];
-      const p2 = walls[i + 1];
+    const walls = levelData.walls;
 
-      const axis = {
-        x: p2.y - p1.y,
-        y: p1.x - p2.x,
-      };
+    if (levelData.mapType === "object") {
+      for (let i = 0; i < walls.length - 1; i++) {
+        const p1 = walls[i];
+        const p2 = walls[i + 1];
 
-      const magnitude = Math.sqrt(axis.x * axis.x + axis.y * axis.y);
-      axis.x /= magnitude;
-      axis.y /= magnitude;
+        const axis = {
+          x: p2.y - p1.y,
+          y: p1.x - p2.x,
+        };
 
-      const thickP1 = {
-        x: p1.x - 2 * axis.x,
-        y: p1.y - 2 * axis.y,
-      };
+        const magnitude = Math.sqrt(axis.x * axis.x + axis.y * axis.y);
+        axis.x /= magnitude;
+        axis.y /= magnitude;
 
-      const thickP2 = {
-        x: p2.x - 2 * axis.x,
-        y: p2.y - 2 * axis.y,
-      };
+        const thickP1 = {
+          x: p1.x - 2 * axis.x,
+          y: p1.y - 2 * axis.y,
+        };
 
-      const ballProjection = this.#project(this, axis);
-      const wallProjection = this.#project([thickP1, thickP2], axis);
+        const thickP2 = {
+          x: p2.x - 2 * axis.x,
+          y: p2.y - 2 * axis.y,
+        };
 
-      ballProjection.min -= this.radius;
-      ballProjection.max += this.radius;
+        const ballProjection = this.#project(this, axis);
+        const wallProjection = this.#project([thickP1, thickP2], axis);
 
-      if (this.#overlap(ballProjection, wallProjection)) {
-        collide = true;
+        ballProjection.min -= this.radius;
+        ballProjection.max += this.radius;
 
-        this.x = this.lastPos.x;
-        this.y = this.lastPos.y;
+        if (this.#overlap(ballProjection, wallProjection)) {
+          collide = true;
 
-        const dotProduct =
-          this.direction.x * axis.x + this.direction.y * axis.y;
-        this.direction.x -= 2 * dotProduct * axis.x;
-        this.direction.y -= 2 * dotProduct * axis.y;
+          this.x = this.lastPos.x;
+          this.y = this.lastPos.y;
+
+          const dotProduct =
+            this.direction.x * axis.x + this.direction.y * axis.y;
+          this.direction.x -= 2 * dotProduct * axis.x;
+          this.direction.y -= 2 * dotProduct * axis.y;
+        }
+      }
+    } else if (levelData.mapType === "array") {
+      for (const wall of walls) {
+        for (let i = 0; i < wall.length - 1; i++) {
+          const p1 = wall[i];
+          const p2 = wall[i + 1];
+
+          const axis = {
+            x: p2.y - p1.y,
+            y: p1.x - p2.x,
+          };
+
+          const magnitude = Math.sqrt(axis.x * axis.x + axis.y * axis.y);
+          axis.x /= magnitude;
+          axis.y /= magnitude;
+
+          const ballProjection = this.#project(this, axis);
+          const wallProjection = this.#project([p1, p2], axis);
+
+          ballProjection.min -= this.radius;
+          ballProjection.max += this.radius;
+
+          if (this.#overlap(ballProjection, wallProjection)) {
+            collide = true;
+
+            this.x = this.lastPos.x;
+            this.y = this.lastPos.y;
+
+            const dotProduct =
+              this.direction.x * axis.x + this.direction.y * axis.y;
+            this.direction.x -= 2 * dotProduct * axis.x;
+            this.direction.y -= 2 * dotProduct * axis.y;
+          }
+        }
       }
     }
 

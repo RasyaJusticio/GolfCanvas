@@ -68,7 +68,7 @@
   }
 
   // Draw Functions
-  function drawHole(deltaTime) {
+  function drawHole() {
     ctx.save();
 
     ctx.fillStyle = "black";
@@ -124,22 +124,31 @@
     cacheCtx.fillStyle = "rgb(1, 57, 9)";
     cacheCtx.beginPath();
 
-    const p1 = levelData.walls[0];
-    cacheCtx.moveTo(p1.x, p1.y);
+    const walls = levelData.walls;
 
-    for (let index = 1; index < levelData.walls.length; index++) {
-      const p2 = levelData.walls[index];
+    if (levelData.mapType === "object") {
+      const p1 = walls[0];
+      cacheCtx.moveTo(p1.x, p1.y);
 
-      cacheCtx.lineTo(p2.x, p2.y);
+      for (let i = 0; i < walls.length; i++) {
+        const p2 = walls[i];
+        cacheCtx.lineTo(p2.x, p2.y);
+      }
+
+      cacheCtx.fill();
+    } else if (levelData.mapType === "array") {
+      for (const wall of walls) {
+        const p1 = wall[0];
+        cacheCtx.moveTo(p1.x, p1.y);
+
+        for (let i = 0; i < wall.length; i++) {
+          const p2 = wall[i];
+          cacheCtx.lineTo(p2.x, p2.y);
+        }
+
+        cacheCtx.fill();
+      }
     }
-
-    const firstPoint = levelData.walls[0];
-    const lastPoint = levelData.walls[levelData.walls.length - 1];
-    if (firstPoint.x !== lastPoint.x || firstPoint.y !== lastPoint.y) {
-      cacheCtx.lineTo(firstPoint.x, firstPoint.y);
-    }
-
-    cacheCtx.fill();
   }
 
   // Events
@@ -177,7 +186,7 @@
 
   // Main
   function update(deltaTime) {
-    ball.update(deltaTime, levelData.walls);
+    ball.update(deltaTime, levelData);
     checkHoleCollision();
 
     perSecondTime += deltaTime / 1000;
